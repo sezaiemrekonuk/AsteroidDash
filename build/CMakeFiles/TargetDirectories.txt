@@ -1,0 +1,3 @@
+/Users/sezaiemrekonuk/Desktop/assignment_2_starter_code/build/CMakeFiles/AsteroidDash.dir
+/Users/sezaiemrekonuk/Desktop/assignment_2_starter_code/build/CMakeFiles/edit_cache.dir
+/Users/sezaiemrekonuk/Desktop/assignment_2_starter_code/build/CMakeFiles/rebuild_cache.dir

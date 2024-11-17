@@ -1,0 +1,44 @@
+[
+{
+  "directory": "/Users/sezaiemrekonuk/Desktop/assignment_2_starter_code/build",
+  "command": "/usr/bin/clang++  -I/Users/sezaiemrekonuk/Desktop/assignment_2_starter_code/.  -g -g -std=gnu++11 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk -o CMakeFiles/AsteroidDash.dir/AsteroidDash.cpp.o -c /Users/sezaiemrekonuk/Desktop/assignment_2_starter_code/AsteroidDash.cpp",
+  "file": "/Users/sezaiemrekonuk/Desktop/assignment_2_starter_code/AsteroidDash.cpp",
+  "output": "CMakeFiles/AsteroidDash.dir/AsteroidDash.cpp.o"
+},
+{
+  "directory": "/Users/sezaiemrekonuk/Desktop/assignment_2_starter_code/build",
+  "command": "/usr/bin/clang++  -I/Users/sezaiemrekonuk/Desktop/assignment_2_starter_code/.  -g -g -std=gnu++11 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk -o CMakeFiles/AsteroidDash.dir/CelestialObject.cpp.o -c /Users/sezaiemrekonuk/Desktop/assignment_2_starter_code/CelestialObject.cpp",
+  "file": "/Users/sezaiemrekonuk/Desktop/assignment_2_starter_code/CelestialObject.cpp",
+  "output": "CMakeFiles/AsteroidDash.dir/CelestialObject.cpp.o"
+},
+{
+  "directory": "/Users/sezaiemrekonuk/Desktop/assignment_2_starter_code/build",
+  "command": "/usr/bin/clang++  -I/Users/sezaiemrekonuk/Desktop/assignment_2_starter_code/.  -g -g -std=gnu++11 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk -o CMakeFiles/AsteroidDash.dir/GameController.cpp.o -c /Users/sezaiemrekonuk/Desktop/assignment_2_starter_code/GameController.cpp",
+  "file": "/Users/sezaiemrekonuk/Desktop/assignment_2_starter_code/GameController.cpp",
+  "output": "CMakeFiles/AsteroidDash.dir/GameController.cpp.o"
+},
+{
+  "directory": "/Users/sezaiemrekonuk/Desktop/assignment_2_starter_code/build",
+  "command": "/usr/bin/clang++  -I/Users/sezaiemrekonuk/Desktop/assignment_2_starter_code/.  -g -g -std=gnu++11 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk -o CMakeFiles/AsteroidDash.dir/Leaderboard.cpp.o -c /Users/sezaiemrekonuk/Desktop/assignment_2_starter_code/Leaderboard.cpp",
+  "file": "/Users/sezaiemrekonuk/Desktop/assignment_2_starter_code/Leaderboard.cpp",
+  "output": "CMakeFiles/AsteroidDash.dir/Leaderboard.cpp.o"
+},
+{
+  "directory": "/Users/sezaiemrekonuk/Desktop/assignment_2_starter_code/build",
+  "command": "/usr/bin/clang++  -I/Users/sezaiemrekonuk/Desktop/assignment_2_starter_code/.  -g -g -std=gnu++11 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk -o CMakeFiles/AsteroidDash.dir/LeaderboardEntry.cpp.o -c /Users/sezaiemrekonuk/Desktop/assignment_2_starter_code/LeaderboardEntry.cpp",
+  "file": "/Users/sezaiemrekonuk/Desktop/assignment_2_starter_code/LeaderboardEntry.cpp",
+  "output": "CMakeFiles/AsteroidDash.dir/LeaderboardEntry.cpp.o"
+},
+{
+  "directory": "/Users/sezaiemrekonuk/Desktop/assignment_2_starter_code/build",
+  "command": "/usr/bin/clang++  -I/Users/sezaiemrekonuk/Desktop/assignment_2_starter_code/.  -g -g -std=gnu++11 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk -o CMakeFiles/AsteroidDash.dir/Player.cpp.o -c /Users/sezaiemrekonuk/Desktop/assignment_2_starter_code/Player.cpp",
+  "file": "/Users/sezaiemrekonuk/Desktop/assignment_2_starter_code/Player.cpp",
+  "output": "CMakeFiles/AsteroidDash.dir/Player.cpp.o"
+},
+{
+  "directory": "/Users/sezaiemrekonuk/Desktop/assignment_2_starter_code/build",
+  "command": "/usr/bin/clang++  -I/Users/sezaiemrekonuk/Desktop/assignment_2_starter_code/.  -g -g -std=gnu++11 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk -o CMakeFiles/AsteroidDash.dir/main.cpp.o -c /Users/sezaiemrekonuk/Desktop/assignment_2_starter_code/main.cpp",
+  "file": "/Users/sezaiemrekonuk/Desktop/assignment_2_starter_code/main.cpp",
+  "output": "CMakeFiles/AsteroidDash.dir/main.cpp.o"
+}
+]
