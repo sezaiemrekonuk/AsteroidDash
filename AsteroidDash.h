@@ -75,6 +75,34 @@ public:
     // Function to print the space_grid
     void print_space_grid() const;
 
+    void clear_grid();
+
+    void update_ammo_positions();
+
+    void handle_ammo_collisions();
+
+    void handle_asteroid_hit(CelestialObject *current, int i, int j, Ammo *current_ammo);
+
+    void handle_player_collisions();
+
+    void check_object_player_collision(CelestialObject *current);
+
+    bool is_valid_position(int row, int col) const;
+
+    bool is_collision_with_player(int row, int col) const;
+
+    void handle_collision_effect(CelestialObject *current);
+
+    void cleanup_ammo();
+
+    void draw_game_objects();
+
+    void draw_player();
+
+    void draw_celestial_objects();
+
+    void draw_ammo();
+
     // Function to read the space grid from a file
     void read_space_grid(const string &input_file);
 
@@ -87,6 +115,8 @@ public:
 
     // Updates the grid based on player and celestial object states
     void update_space_grid();
+
+    void update_leaderboard();
 
     // Corresponds to the SHOOT command.
     void shoot();

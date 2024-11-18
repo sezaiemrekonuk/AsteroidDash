@@ -11,12 +11,13 @@ AsteroidDash::AsteroidDash(const string &space_grid_file_name,
     : leaderboard_file_name(leaderboard_file_name), leaderboard(Leaderboard())
 {
 
-    read_player(player_file_name, player_name);          // Initialize player using the player.dat file
-    read_space_grid(space_grid_file_name);               // Initialize the grid after the player is loade
-    read_celestial_objects(celestial_objects_file_name); // Load celestial objects
-    // leaderboard.read_from_file(leaderboard_file_name);
+    read_player(player_file_name, player_name);
+    read_space_grid(space_grid_file_name);
+    read_celestial_objects(celestial_objects_file_name);
+    leaderboard.read_from_file(leaderboard_file_name);
 
     update_space_grid();
+    current_score = -1;
 }
 
 // Function to read the space grid from a file
@@ -206,7 +207,8 @@ void AsteroidDash::read_celestial_objects(const std::string &input_file)
             line.erase(line.find_last_not_of(" \t\n\r\f\v") + 1);
         }
 
-        CelestialObject *object = new CelestialObject(shape, object_type, start_row, time_of_appearance, false);
+        CelestialObject *object = new CelestialObject(shape, object_type, start_row, time_of_appearance);
+        object->generate_rotations();
         // std::cout << "celestial object initialized" << std::endl;
 
         // sec3: adding to the linked list
@@ -230,85 +232,101 @@ void AsteroidDash::read_celestial_objects(const std::string &input_file)
 void AsteroidDash::print_space_grid() const
 {
     // TODO: Your code here
-    std::ofstream output_file("output.txt", std::ios::app);
-    if (!output_file)
-    {
-        std::cerr << "Error: Cannot open output file." << std::endl;
-        return;
-    }
+    // std::ofstream output_file("output.txt", std::ios::app);
+    // if (!output_file)
+    // {
+    //     std::cerr << "Error: Cannot open output file." << std::endl;
+    //     return;
+    // }
 
-    output_file << "Tick: " << game_time << std::endl;
-    output_file << "Lives: " << player->lives << std::endl;
-    output_file << "Ammo: " << player->current_ammo << std::endl;
-    output_file << "Score: " << current_score << std::endl;
-    // output_file << "High Score: " << leaderboard.get_high_score() << std::endl;
+    std::cout << "Tick: " << game_time << std::endl;
+    std::cout << "Lives: " << player->lives << std::endl;
+    std::cout << "Ammo: " << player->current_ammo << std::endl;
+    std::cout << "Score: " << current_score << std::endl;
+    std::cout << "High Score: " << leaderboard.get_high_score() << std::endl;
     for (const auto &row : space_grid)
     {
         for (int cell : row)
         {
-            output_file << (cell == 1 ? occupiedCellChar : unoccupiedCellChar);
+            std::cout << (cell == 1 ? occupiedCellChar : unoccupiedCellChar);
         }
-        output_file << std::endl;
+        std::cout << std::endl;
     }
+    std::cout << std::endl;
 
-    output_file.close();
+    // output_file << "Tick: " << game_time << std::endl;
+    // output_file << "Lives: " << player->lives << std::endl;
+    // output_file << "Ammo: " << player->current_ammo << std::endl;
+    // output_file << "Score: " << current_score << std::endl;
+    // output_file << "High Score: " << leaderboard.get_high_score() << std::endl;
+    // for (const auto &row : space_grid)
+    // {
+    //     for (int cell : row)
+    //     {
+    //         output_file << (cell == 1 ? occupiedCellChar : unoccupiedCellChar);
+    //     }
+    //     output_file << std::endl;
+    // }
+    // output_file << std::endl;
+    // output_file.close();
 }
 
 // Function to spawn the player in the space grid
 
 // Function to update the space grid with player, celestial objects, and any other changes
 // It is called in every game tick before moving on to the next tick.
-void AsteroidDash::update_space_grid()
+void AsteroidDash::clear_grid()
 {
-    // 1. Clear the space grid first
+    if (space_grid.empty())
+    {
+        return;
+    }
+
     for (auto &row : space_grid)
     {
         std::fill(row.begin(), row.end(), 0);
     }
+}
 
-    // 2. Move ammo before collision checks
+void AsteroidDash::update_ammo_positions()
+{
     Ammo *current_ammo = ammo_list_head;
     while (current_ammo)
     {
         current_ammo->x += 1;
         current_ammo = current_ammo->next_ammo;
     }
+}
 
-    // 3. Check collisions between ammo and celestial objects
-    current_ammo = ammo_list_head;
-    while (current_ammo)
+void AsteroidDash::handle_ammo_collisions()
+{
+    if (space_grid.empty() || ammo_list_head == nullptr)
+        return;
+
+    Ammo *current_ammo = ammo_list_head;
+    while (current_ammo && current_ammo->x >= 0 && current_ammo->y >= 0)
     {
         CelestialObject *current = celestial_objects_list_head;
         while (current)
         {
-            if (game_time >= current->time_of_appearance)
+            if (current && game_time >= current->time_of_appearance && !current->shape.empty())
             {
-                for (int i = 0; i < current->shape.size(); ++i)
+                for (size_t i = 0; i < current->shape.size(); ++i)
                 {
-                    for (int j = 0; j < current->shape[i].size(); ++j)
+                    if (i < current->shape.size() && !current->shape[i].empty())
                     {
-                        if (current->shape[i][j])
+                        for (size_t j = 0; j < current->shape[i].size(); ++j)
                         {
-                            int row = current->starting_row + i;
-                            int col = space_grid[0].size() - 1 - (game_time - current->time_of_appearance) + j;
-                            if (row >= 0 && row < space_grid.size() && col >= 0 && col < space_grid[0].size())
+                            if (current->shape[i][j])
                             {
-                                if (current_ammo->x == col && current_ammo->y == row)
+                                int row = current->starting_row + i;
+                                int col = space_grid[0].size() - 1 - (game_time - current->time_of_appearance) + j;
+                                if (row >= 0 && row < static_cast<int>(space_grid.size()) &&
+                                    col >= 0 && col < static_cast<int>(space_grid[0].size()))
                                 {
-                                    if (current->object_type == ObjectType::ASTEROID)
+                                    if (current_ammo && current_ammo->x == col && current_ammo->y == row)
                                     {
-                                        current->shape[i][j - 1] = false;
-                                        current->generate_rotations();
-                                        if (i < current->shape.size() / 2)
-                                        {
-                                            current->shape = current->right_rotation->shape;
-                                        }
-                                        else
-                                        {
-                                            current->shape = current->left_rotation->shape;
-                                        }
-                                        current_ammo->x = -1;
-                                        current_ammo->y = -1;
+                                        handle_asteroid_hit(current, i, j, current_ammo);
                                     }
                                 }
                             }
@@ -318,56 +336,164 @@ void AsteroidDash::update_space_grid()
             }
             current = current->next_celestial_object;
         }
-        current_ammo = current_ammo->next_ammo;
-    }
-
-    // 4. Check collisions between player and celestial objects
-    CelestialObject *current = celestial_objects_list_head;
-    while (current)
-    {
-        if (game_time >= current->time_of_appearance)
+        if (current_ammo)
         {
-            for (int i = 0; i < current->shape.size(); ++i)
+            current_ammo = current_ammo->next_ammo;
+        }
+    }
+}
+
+void AsteroidDash::handle_asteroid_hit(CelestialObject *current, int i, int j, Ammo *current_ammo)
+{
+    if (!current || !current_ammo)
+        return;
+    if (current->object_type == ObjectType::ASTEROID && !current->shape.empty())
+    {
+        current_score += 10;
+
+        current->shape[i][j - 1] = false;
+        current->generate_rotations();
+        // if asteroid gets hit above or below the center it should be rotated
+        if (i > 0 && current->shape[i - 1][j])
+        {
+            current->shape = current->left_rotation->shape;
+        }
+        else if (i < current->shape.size() - 1 && current->shape[i + 1][j])
+        {
+            current->shape = current->right_rotation->shape;
+        }
+
+        bool isDestroyed = true;
+        for (const auto &row : current->shape)
+        {
+            for (bool cell : row)
             {
-                for (int j = 0; j < current->shape[i].size(); ++j)
+                if (cell)
                 {
-                    if (current->shape[i][j])
+                    isDestroyed = false;
+                    break;
+                }
+            }
+            if (!isDestroyed)
+                break;
+        }
+
+        if (isDestroyed)
+        {
+            int bonusPoints;
+            int totalSize = 0;
+            for (auto &row : current->shape)
+            {
+                for (bool cell : row)
+                {
+                    if (cell)
                     {
-                        int row = current->starting_row + i;
-                        int col = space_grid[0].size() - 1 - (game_time - current->time_of_appearance) + j;
-                        if (row >= 0 && row < space_grid.size() && col >= 0 && col < space_grid[0].size())
-                        {
-                            if (row >= player->get_y() && row < player->get_y() + player->spacecraft_shape.size() &&
-                                col >= player->get_x() && col < player->get_x() + player->spacecraft_shape[0].size() &&
-                                player->spacecraft_shape[row - player->get_y()][col - player->get_x()])
-                            {
-                                if (current->object_type == ObjectType::ASTEROID)
-                                {
-                                    player->decrease_lives();
-                                    current->shape.clear();
-                                }
-                                else if (current->object_type == ObjectType::LIFE_UP)
-                                {
-                                    player->increase_lives();
-                                    current->shape.clear();
-                                }
-                                else if (current->object_type == ObjectType::AMMO)
-                                {
-                                    player->reload();
-                                    current->shape.clear();
-                                }
-                            }
-                        }
+                        totalSize++;
                     }
                 }
             }
+
+            bonusPoints = totalSize * 100;
+
+            current_score += bonusPoints;
+        }
+
+        current_ammo->x = -1;
+        current_ammo->y = -1;
+    }
+}
+
+void AsteroidDash::handle_player_collisions()
+{
+    if (!player || space_grid.empty())
+        return;
+
+    CelestialObject *current = celestial_objects_list_head;
+    while (current)
+    {
+        if (current->shape.empty())
+        {
+            current = current->next_celestial_object;
+            continue;
+        }
+        if (game_time >= current->time_of_appearance)
+        {
+            check_object_player_collision(current);
         }
         current = current->next_celestial_object;
     }
+}
 
-    // 5. Clean up out-of-bounds ammo
+void AsteroidDash::check_object_player_collision(CelestialObject *current)
+{
+    if (!current || current->shape.empty() || space_grid.empty())
+    {
+        return;
+    }
+
+    for (int i = 0; i < current->shape.size(); ++i)
+    {
+        if (i >= current->shape.size())
+            continue;
+        for (int j = 0; j < current->shape[i].size(); ++j)
+        {
+            if (j >= current->shape[i].size())
+                continue;
+            if (current->shape[i][j])
+            {
+                int row = current->starting_row + i;
+                int col = space_grid[0].size() - 1 - (game_time - current->time_of_appearance) + j;
+                if (is_valid_position(row, col) && is_collision_with_player(row, col))
+                {
+                    handle_collision_effect(current);
+                    if (current->object_type == ObjectType::ASTEROID)
+                    {
+
+                        current_score -= 1;
+                    }
+                    return;
+                }
+            }
+        }
+    }
+}
+
+bool AsteroidDash::is_valid_position(int row, int col) const
+{
+    return row >= 0 && row < space_grid.size() && col >= 0 && col < space_grid[0].size();
+}
+
+bool AsteroidDash::is_collision_with_player(int row, int col) const
+{
+    return row >= player->get_y() && row < player->get_y() + player->spacecraft_shape.size() &&
+           col >= player->get_x() && col < player->get_x() + player->spacecraft_shape[0].size() &&
+           player->spacecraft_shape[row - player->get_y()][col - player->get_x()];
+}
+
+void AsteroidDash::handle_collision_effect(CelestialObject *current)
+{
+    switch (current->object_type)
+    {
+    case ObjectType::ASTEROID:
+        player->decrease_lives();
+        break;
+    case ObjectType::LIFE_UP:
+        player->increase_lives();
+        break;
+    case ObjectType::AMMO:
+        player->reload();
+        break;
+    }
+    current->shape.clear();
+}
+
+void AsteroidDash::cleanup_ammo()
+{
+    if (space_grid.empty())
+        return;
+
     Ammo *prev_ammo = nullptr;
-    current_ammo = ammo_list_head;
+    Ammo *current_ammo = ammo_list_head;
     while (current_ammo)
     {
         if (current_ammo->x < 0 || current_ammo->x >= space_grid[0].size())
@@ -391,9 +517,15 @@ void AsteroidDash::update_space_grid()
             current_ammo = current_ammo->next_ammo;
         }
     }
+}
 
-    // 6. Update display grid with current positions
-    // Draw player
+void AsteroidDash::draw_player()
+{
+    if (!player || player->spacecraft_shape.empty())
+    {
+        return;
+    }
+
     for (int i = 0; i < player->spacecraft_shape.size(); ++i)
     {
         for (int j = 0; j < player->spacecraft_shape[i].size(); ++j)
@@ -402,45 +534,64 @@ void AsteroidDash::update_space_grid()
             {
                 int row = player->get_y() + i;
                 int col = player->get_x() + j;
-                if (row >= 0 && row < space_grid.size() && col >= 0 && col < space_grid[0].size())
+                if (is_valid_position(row, col))
                 {
                     space_grid[row][col] = 1;
                 }
             }
         }
     }
+}
 
-    // Draw celestial objects
-    current = celestial_objects_list_head;
+void AsteroidDash::draw_celestial_objects()
+{
+    if (space_grid.empty() || celestial_objects_list_head == nullptr)
+        return;
+
+    CelestialObject *current = celestial_objects_list_head;
     while (current)
     {
-        if (game_time >= current->time_of_appearance)
+        if (current->shape.empty() || game_time < current->time_of_appearance)
         {
-            for (int i = 0; i < current->shape.size(); ++i)
+            current = current->next_celestial_object;
+            continue;
+        }
+
+        for (size_t i = 0; i < current->shape.size(); ++i)
+        {
+            if (i >= current->shape.size() || current->shape[i].empty())
+                continue;
+
+            for (size_t j = 0; j < current->shape[i].size(); ++j)
             {
-                for (int j = 0; j < current->shape[i].size(); ++j)
+                if (j >= current->shape[i].size())
+                    continue;
+
+                if (current->shape[i][j])
                 {
-                    if (current->shape[i][j])
+                    int row = current->starting_row + i;
+                    int col = space_grid[0].size() - 1 - (game_time - current->time_of_appearance) + j;
+                    if (is_valid_position(row, col))
                     {
-                        int row = current->starting_row + i;
-                        int col = space_grid[0].size() - 1 - (game_time - current->time_of_appearance) + j;
-                        if (row >= 0 && row < space_grid.size() && col >= 0 && col < space_grid[0].size())
-                        {
-                            space_grid[row][col] = 1;
-                        }
+                        space_grid[row][col] = 1;
                     }
                 }
             }
         }
         current = current->next_celestial_object;
     }
+}
 
-    // Draw ammo
-    current_ammo = ammo_list_head;
+void AsteroidDash::draw_ammo()
+{
+    if (space_grid.empty() || ammo_list_head == nullptr)
+        return;
+
+    Ammo *current_ammo = ammo_list_head;
     while (current_ammo)
     {
-        if (current_ammo->x >= 0 && current_ammo->x < space_grid[0].size() &&
-            current_ammo->y >= 0 && current_ammo->y < space_grid.size())
+        if (current_ammo->x >= 0 && current_ammo->y >= 0 &&
+            is_valid_position(current_ammo->y, current_ammo->x))
         {
             space_grid[current_ammo->y][current_ammo->x] = 1;
         }
@@ -448,11 +599,50 @@ void AsteroidDash::update_space_grid()
     }
 }
 
+void AsteroidDash::draw_game_objects()
+{
+    draw_player();
+    draw_celestial_objects();
+    draw_ammo();
+}
+
+void AsteroidDash::update_space_grid()
+{
+    if (game_over)
+    {
+        return;
+    }
+
+    clear_grid();
+    update_ammo_positions();
+    handle_ammo_collisions();
+    handle_player_collisions();
+
+    if (!player->is_alive())
+    {
+        game_over = true;
+    }
+    current_score += 1;
+    cleanup_ammo();
+    draw_game_objects();
+}
+
+void AsteroidDash::update_leaderboard()
+{
+    LeaderboardEntry *newEntry = new LeaderboardEntry(current_score, time(nullptr), player->player_name);
+    leaderboard.insert(newEntry);
+    leaderboard.write_to_file(leaderboard_file_name);
+}
+
 // Corresponds to the SHOOT command.
 // It should shoot if the player has enough ammo.
 // It should decrease the player's ammo
 void AsteroidDash::shoot()
 {
+    if (!player)
+    {
+        return;
+    }
     int ammo_x = player->get_x() + player->spacecraft_shape[0].size();
     int ammo_y = player->get_y() + player->spacecraft_shape.size() / 2;
 
@@ -492,7 +682,12 @@ int AsteroidDash::get_grid_height() const
 AsteroidDash::~AsteroidDash()
 {
     // TODO: Your code here
-    delete player;
+    if (player)
+    {
+        delete player;
+        player = nullptr;
+    }
+
     CelestialObject *current = celestial_objects_list_head;
     while (current)
     {
@@ -500,6 +695,7 @@ AsteroidDash::~AsteroidDash()
         delete current;
         current = next;
     }
+    celestial_objects_list_head = nullptr;
 
     Ammo *current_ammo = ammo_list_head;
     while (current_ammo)
@@ -508,6 +704,7 @@ AsteroidDash::~AsteroidDash()
         delete current_ammo;
         current_ammo = next;
     }
+    ammo_list_head = nullptr;
 }
 
 Ammo::Ammo(int x, int y) : x(x), y(y)

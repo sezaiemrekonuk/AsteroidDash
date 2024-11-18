@@ -31,10 +31,32 @@ void GameController::play(const string &commands_file)
     std::string command;
     while (std::getline(file, command))
     {
-        game->update_space_grid();
         process_command(command);
+        game->update_space_grid();
         game->game_time++;
     }
+
+    game->current_score++; // last command doesnt proceed to a tick, so +1
+    game->game_time--;     // last command is not a tick
+
+    std::cout << "GAME FINISHED! No more commands!" << std::endl;
+    std::cout << "Tick: " << game->game_time << std::endl;
+    std::cout << "Lives: " << game->player->lives << std::endl;
+    std::cout << "Ammo: " << game->player->current_ammo << std::endl;
+    std::cout << "Score: " << game->current_score << std::endl;
+    std::cout << "High Score: " << game->leaderboard.get_high_score() << std::endl;
+    std::cout << "Player: " << game->player->player_name << std::endl;
+    for (const auto &row : game->space_grid)
+    {
+        for (int cell : row)
+        {
+            std::cout << (cell == 1 ? occupiedCellChar : unoccupiedCellChar);
+        }
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+    game->leaderboard.print_leaderboard();
+    game->update_leaderboard();
 }
 
 // Processes a single command and updates game state accordingly
@@ -82,4 +104,5 @@ GameController::~GameController()
 {
     // TODO: Your code here
     delete game; // game object will handle the rest
+    game = nullptr;
 }

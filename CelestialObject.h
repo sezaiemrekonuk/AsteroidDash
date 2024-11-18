@@ -17,7 +17,7 @@ class CelestialObject
 {
 public:
     // Constructor to initialize CelestialObject with essential properties
-    CelestialObject(const vector<vector<bool>> &shape, ObjectType type, int start_row, int time_of_appearance, bool is_a_rotation);
+    CelestialObject(const vector<vector<bool>> &shape, ObjectType type, int start_row, int time_of_appearance);
 
     // Copy constructor for CelestialObject
     CelestialObject(const CelestialObject *other);
@@ -33,9 +33,6 @@ public:
 
     // Pointer to the next celestial object in the list
     CelestialObject *next_celestial_object = nullptr;
-
-    // Check for if rotations are generated
-    bool is_a_rotation = false;
 
     // Type of the object (asteroid, life-up, or ammo)
     ObjectType object_type;

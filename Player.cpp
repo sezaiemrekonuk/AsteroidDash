@@ -85,7 +85,7 @@ void Player::reload()
 // Check if the player is alive
 bool Player::is_alive() const
 {
-    return false;
+    return lives > 0;
 }
 
 // Decrease the player's lives

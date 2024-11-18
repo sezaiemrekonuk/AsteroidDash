@@ -13,13 +13,6 @@ int main(int argc, char **argv)
     SetConsoleOutputCP(CP_UTF8);
 #endif
 
-    // string space_grid_file = argv[1];
-    // string celestial_objects_file = argv[2];
-    // string player_file = argv[3];
-    // string commands_file = argv[4];
-    // string leaderboard_file = argv[5];
-    // string player_name = argv[6];
-
     string space_grid_file = argv[1];
     string celestial_objects_file = argv[2];
     string player_file = argv[3];

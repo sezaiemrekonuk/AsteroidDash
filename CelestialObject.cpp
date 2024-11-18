@@ -3,18 +3,12 @@
 
 // Constructor to initialize CelestialObject with essential properties
 CelestialObject::CelestialObject(const vector<vector<bool>> &shape, ObjectType type, int start_row,
-                                 int time_of_appearance, bool is_a_rotation)
-    : shape(shape), object_type(type), starting_row(start_row), time_of_appearance(time_of_appearance), is_a_rotation(is_a_rotation)
+                                 int time_of_appearance)
+    : shape(shape), object_type(type), starting_row(start_row), time_of_appearance(time_of_appearance)
 {
     right_rotation = nullptr;
     left_rotation = nullptr;
     next_celestial_object = nullptr;
-
-    // TODO: Your code here
-    // if (!is_a_rotation && ObjectType::ASTEROID == object_type)
-    // {
-    //     generate_rotations();
-    // }
 }
 
 // Copy constructor for CelestialObject
@@ -42,25 +36,40 @@ CelestialObject::CelestialObject(const CelestialObject *other)
 // Generate rotations for the current celestial object. 90-degree, 180-degree, and 270-degree.
 void CelestialObject::generate_rotations()
 {
-    const int rotation_count = 3;
     CelestialObject *current = this;
+    std::vector<std::vector<bool>> original_shape = this->shape;
 
-    // std::cout << "test 4" << std::endl;
-    for (int i = 0; i < rotation_count; ++i)
+    // 90
+    std::vector<std::vector<bool>> rotated_shape = rotate_clockwise(current->shape);
+    CelestialObject *rotation = new CelestialObject(rotated_shape, object_type, starting_row, time_of_appearance);
+
+    // 180 if equal to original, connect to 90-degree rotation only
+    std::vector<std::vector<bool>> rotation_180 = rotate_clockwise(rotated_shape);
+    if (rotation_180 == original_shape)
     {
-        // rotating the shape and creating a new shape with rotated data
-        std::vector<std::vector<bool>> rotated_shape = rotate_clockwise(current->shape);
-        CelestialObject *rotation = new CelestialObject(rotated_shape, object_type, starting_row, time_of_appearance, true);
-        // std::cout << "test 5 loop: " << i << std::endl;
-        // linking data to the current object
+        // Connect original to 90-degree rotation only
+        this->right_rotation = rotation;
+        rotation->left_rotation = this;
+        rotation->right_rotation = this;
+        this->left_rotation = rotation;
+        return;
+    }
+
+    // if not equeal continue with others
+    current->right_rotation = rotation;
+    rotation->left_rotation = current;
+    current = rotation;
+
+    for (int i = 1; i < 3; ++i)
+    {
+        rotated_shape = rotate_clockwise(current->shape);
+        rotation = new CelestialObject(rotated_shape, object_type, starting_row, time_of_appearance);
         current->right_rotation = rotation;
         rotation->left_rotation = current;
-
-        // moving to the next rotation
         current = rotation;
     }
 
-    // completing the circled list
+    // complete the circular list
     current->right_rotation = this;
     this->left_rotation = current;
 }
@@ -90,26 +99,24 @@ std::vector<std::vector<bool>> CelestialObject::rotate_clockwise(const std::vect
 // memory for each rotation.
 void CelestialObject::delete_rotations(CelestialObject *target)
 {
-    if (!target)
+    if (target == nullptr)
         return;
 
     CelestialObject *current = target->right_rotation;
-    while (current != target)
+    target->right_rotation = nullptr;
+
+    while (current != nullptr && current != target)
     {
         CelestialObject *next = current->right_rotation;
         delete current;
         current = next;
     }
 
-    target->right_rotation = nullptr;
-    target->left_rotation = nullptr;
+    target = nullptr;
 }
 
 // Destructor to free the dynamically allocated memory for the object's shape
 CelestialObject::~CelestialObject()
 {
-    if (right_rotation != this)
-    {
-        delete_rotations(this);
-    }
+    shape.clear();
 }

@@ -9,9 +9,9 @@
 
 using namespace std;
 
-class Leaderboard {
+class Leaderboard
+{
 public:
-
     // Pointer to the head of the linked list
     LeaderboardEntry *head_leaderboard_entry = nullptr;
 
@@ -27,9 +27,12 @@ public:
     //  Insert a new LeaderboardEntry instance into the leaderboard
     void insert(LeaderboardEntry *new_entry);
 
+    unsigned long get_high_score() const;
+
+    void set_high_score(unsigned long score);
+
     // Free dynamically allocated memory used for storing leaderboard entries
     virtual ~Leaderboard();
 };
 
-
-#endif //LEADERBOARD_H
+#endif // LEADERBOARD_H
